@@ -3,7 +3,9 @@ export interface EditorInfo {
 }
 
 export interface EffectInfo {
-  threhold: boolean;
-  brightness: number;
-  Saturation: number;
+  threhold?: boolean;
+  brightness?: number;
+  Saturation?: number;
+  erosionRate?: number;
+  dilationRate?: number;
 }

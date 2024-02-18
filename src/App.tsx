@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import * as cv from "@techstark/opencv-js";
 import { Button } from "./components/ui/button";
+import { EffectInfo } from "./types/editor";
+import { Input } from "./components/ui/input";
+import { Label } from "./components/ui/label";
 
 function App() {
   const fileSelectRef = useRef<HTMLInputElement>(null);
@@ -20,6 +23,11 @@ function App() {
     width: 0,
     height: 0,
   });
+  const [effectInfo, setEffectInfo] = useState<EffectInfo>({
+    erosionRate: 0,
+    dilationRate: 0,
+  });
+
   const handleImgLoad = (imgsrc: HTMLImageElement) => {
     if (canvasRef.current) {
       scale.current = Math.min(
@@ -60,6 +68,21 @@ function App() {
     );
     // cv.medianBlur(result, result, 3);
     // cv.bilateralFilter(result, result, 9, 75, 75);
+    cv.erode(
+      result,
+      result,
+      new cv.Mat(),
+      new cv.Point(-1, -1),
+      effectInfo.erosionRate
+    );
+    cv.dilate(
+      result,
+      result,
+      new cv.Mat(),
+      new cv.Point(-1, -1),
+      effectInfo.dilationRate
+    );
+
     const fg = cvImg.current?.clone();
     const view = fg?.data as Uint8Array;
     const step = 4 * result.cols;
@@ -130,6 +153,11 @@ function App() {
     }
   }, [fileUrl]);
   useEffect(() => {
+    if (cvImg.current) {
+      handleImgSegment();
+    }
+  }, [effectInfo]);
+  useEffect(() => {
     setTimeout(() => {
       setFileUrl("/example.jpg");
     }, 50);
@@ -138,6 +166,7 @@ function App() {
     <>
       <div className="flex justify-center gap-3 mb-5">
         <Button
+          variant={"outline"}
           onClick={() => {
             fileSelectRef.current?.click();
           }}
@@ -145,6 +174,7 @@ function App() {
           选择图像
         </Button>
         <Button
+          variant={"outline"}
           onClick={() => {
             handleImgSegment();
           }}
@@ -175,7 +205,10 @@ function App() {
           justifyContent: "center",
         }}
       >
-        <div className="absolute top-[1000px] left-[1000px]">
+        <div
+          className="absolute top-[1000px] left-[1000px]"
+          style={{ visibility: "hidden" }}
+        >
           <img
             src={fileUrl}
             ref={imgRef}
@@ -208,6 +241,39 @@ function App() {
             // onMouseMove={handleCanvasMouseMove}
           />
           result canvas
+        </div>
+      </div>
+      <div className="flex gap-2 *:w-[200px] justify-center mt-10">
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="erosionRate">腐蚀</Label>
+          <Input
+            type="number"
+            id="erosionRate"
+            value={effectInfo.erosionRate}
+            min={0}
+            onChange={(e) => {
+              setEffectInfo({
+                ...effectInfo,
+                erosionRate: parseInt(e.target.value),
+              });
+            }}
+          />
+        </div>
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="dilationRate">膨胀</Label>
+          <Input
+            type="number"
+            id="dilationRate"
+            value={effectInfo.dilationRate}
+            min={0}
+            width={200}
+            onChange={(e) => {
+              setEffectInfo({
+                ...effectInfo,
+                dilationRate: parseInt(e.target.value),
+              });
+            }}
+          />
         </div>
       </div>
     </>
