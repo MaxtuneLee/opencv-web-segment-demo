@@ -88,6 +88,7 @@ function App() {
     const step = 4 * result.cols;
     for (let x = 0; x < result.rows; x++) {
       for (let y = 0; y < result.cols; y++) {
+        // @ts-ignore : ucharAt 其实是可以接受两个参数的
         const category = result.ucharAt(x, y);
         if (category === cv.GC_BGD || category === cv.GC_PR_BGD) {
           view[x * step + y * 4] = 255;
@@ -99,7 +100,7 @@ function App() {
     }
     cv.imshow("result_frame", fg as cv.Mat);
   };
-  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasMouseUp = () => {
     setDrag(false);
   };
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
