@@ -20,4 +20,4 @@ pnpm dev
 
 ## 截图
 
-![example](public\screenshot.jpg)
+![example](public/screenshot.jpg)
